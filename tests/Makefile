@@ -1,9 +1,9 @@
 GCC=riscv64-unknown-elf-gcc
 OBJDUMP=riscv64-unknown-elf-objdump
 CFLAGS=-mcmodel=medany -std=gnu99 -O2 -fno-common -fno-builtin-printf -Wall
-LDFLAGS=-static -nostdlib -nostartfiles -lgcc
+LDFLAGS=-static -nostdlib -nostartfiles -lgcc -lm
 
-PROGRAMS = pwm blkdev accum charcount
+PROGRAMS = pwm blkdev accum charcount soc
 
 default: $(addsuffix .riscv,$(PROGRAMS))
 
@@ -12,7 +12,7 @@ dumps: $(addsuffix .dump,$(PROGRAMS))
 %.o: %.S
 	$(GCC) $(CFLAGS) -D__ASSEMBLY__=1 -c $< -o $@
 
-%.o: %.c mmio.h
+%.o: %.c mmio.h minunit.h
 	$(GCC) $(CFLAGS) -c $< -o $@
 
 %.riscv: %.o crt.o syscalls.o link.ld
