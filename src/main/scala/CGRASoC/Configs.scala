@@ -1,4 +1,4 @@
-package example
+package CGRASoC
 
 import chisel3._
 import freechips.rocketchip.config.{Parameters, Config}
@@ -18,25 +18,25 @@ object ConfigValName {
 }
 import ConfigValName._
 
-class WithExampleTop extends Config((site, here, up) => {
+class WithTop extends Config((site, here, up) => {
   case BuildTop => (clock: Clock, reset: Bool, p: Parameters) => {
-    Module(LazyModule(new ExampleTop()(p)).module)
+    Module(LazyModule(new Top()(p)).module)
   }
 })
 
 class WithPWM extends Config((site, here, up) => {
   case BuildTop => (clock: Clock, reset: Bool, p: Parameters) =>
-    Module(LazyModule(new ExampleTopWithPWMTL()(p)).module)
+    Module(LazyModule(new TopWithPWMTL()(p)).module)
 })
 
 class WithPWMAXI4 extends Config((site, here, up) => {
   case BuildTop => (clock: Clock, reset: Bool, p: Parameters) =>
-    Module(LazyModule(new ExampleTopWithPWMAXI4()(p)).module)
+    Module(LazyModule(new TopWithPWMAXI4()(p)).module)
 })
 
 class WithBlockDeviceModel extends Config((site, here, up) => {
   case BuildTop => (clock: Clock, reset: Bool, p: Parameters) => {
-    val top = Module(LazyModule(new ExampleTopWithBlockDevice()(p)).module)
+    val top = Module(LazyModule(new TopWithBlockDevice()(p)).module)
     top.connectBlockDeviceModel()
     top
   }
@@ -44,31 +44,31 @@ class WithBlockDeviceModel extends Config((site, here, up) => {
 
 class WithSimBlockDevice extends Config((site, here, up) => {
   case BuildTop => (clock: Clock, reset: Bool, p: Parameters) => {
-    val top = Module(LazyModule(new ExampleTopWithBlockDevice()(p)).module)
+    val top = Module(LazyModule(new TopWithBlockDevice()(p)).module)
     top.connectSimBlockDevice(clock, reset)
     top
   }
 })
 
-class BaseExampleConfig extends Config(
+class BaseConfig extends Config(
   new WithBootROM ++
   new freechips.rocketchip.system.DefaultConfig)
 
-class DefaultExampleConfig extends Config(
-  new WithExampleTop ++ new BaseExampleConfig)
+class DefaultConfig extends Config(
+  new WithTop ++ new BaseConfig)
 
-class RoccExampleConfig extends Config(
-  new WithRoccExample ++ new DefaultExampleConfig)
+class RoccConfig extends Config(
+  new WithRoccExample ++ new DefaultConfig)
 
-class PWMConfig extends Config(new WithPWM ++ new BaseExampleConfig)
+class PWMConfig extends Config(new WithPWM ++ new BaseConfig)
 
-class PWMAXI4Config extends Config(new WithPWMAXI4 ++ new BaseExampleConfig)
+class PWMAXI4Config extends Config(new WithPWMAXI4 ++ new BaseConfig)
 
 class SimBlockDeviceConfig extends Config(
-  new WithBlockDevice ++ new WithSimBlockDevice ++ new BaseExampleConfig)
+  new WithBlockDevice ++ new WithSimBlockDevice ++ new BaseConfig)
 
 class BlockDeviceModelConfig extends Config(
-  new WithBlockDevice ++ new WithBlockDeviceModel ++ new BaseExampleConfig)
+  new WithBlockDevice ++ new WithBlockDeviceModel ++ new BaseConfig)
 
 class WithTwoTrackers extends WithNBlockDeviceTrackers(2)
 class WithFourTrackers extends WithNBlockDeviceTrackers(4)
@@ -78,7 +78,7 @@ class WithFourMemChannels extends WithNMemoryChannels(4)
 
 class DualCoreConfig extends Config(
   // Core gets tacked onto existing list
-  new WithNBigCores(2) ++ new DefaultExampleConfig)
+  new WithNBigCores(2) ++ new DefaultConfig)
 
-class RV32ExampleConfig extends Config(
-  new WithRV32 ++ new DefaultExampleConfig)
+class RV32Config extends Config(
+  new WithRV32 ++ new DefaultConfig)
