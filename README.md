@@ -7,7 +7,7 @@
 After cloning this repo, you will need to initialize all of the submodules
 
     git clone https://github.com/KPrabs106/riscv-soc.git
-    cd project-template
+    cd riscv-soc
     git submodule update --init --recursive
 
 ### Building the tools
