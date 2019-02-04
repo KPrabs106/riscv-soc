@@ -1,3 +1,8 @@
+#define PHY_ENABLE 0x2008
+#define PHY_DONE 0x2010
+#define PHY_DATA_OUT 0x2014
+#define PHY_COUNT 0x2018
+
 #include <stdio.h>
 
 #include "minunit.h"
