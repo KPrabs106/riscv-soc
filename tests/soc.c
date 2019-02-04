@@ -2,6 +2,7 @@
 #define PHY_DONE 0x2010
 #define PHY_DATA_OUT 0x2014
 #define PHY_COUNT 0x2018
+#define PHY_DATA_IN 0x2020
 
 #define CGRA_ENABLE 0x4000
 #define CGRA_DONE 0x4008
@@ -64,7 +65,24 @@ MU_TEST_SUITE(CGRA_test_suite){
 }
 
 MU_TEST(integration_test){
-	
+	reg_write32(PHY_ENABLE, 1);
+	uint32_t phy_data_out = reg_read32(PHY_DATA_OUT);
+
+	reg_write32(CGRA_ADDRESS_IN, PHY_DATA_OUT);
+	reg_write32(CGRA_ENABLE, 1);
+
+	uint32_t done;
+	while( (done = reg_read32(CGRA_DONE)) == 0);
+
+	uint32_t cgra_data_in = reg_read32(CGRA_DATA_IN);
+	mu_check(cgra_data_in == phy_data_out);
+
+	uint32_t cgra_data_out = reg_read32(CGRA_DATA_OUT);
+	mu_check(cgra_data_out == phy_data_out + 1);
+
+	uint32_t phy_data_in = reg_read32(PHY_DATA_IN);
+	mu_check(phy_data_in == cgra_data_out);
+
 }
 
 MU_TEST_SUITE(integration_test_suite){
