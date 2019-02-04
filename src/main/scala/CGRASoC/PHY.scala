@@ -1,4 +1,4 @@
-package example
+package CGRASoC
 
 import chisel3._
 import chisel3.util._
@@ -54,14 +54,14 @@ class PHYBase(w: Int) extends Module {
 
 }
 
-trait PHYTLBundle extends Bundle {
+trait PHYBundle extends Bundle {
   val done = Output(Bool())
   val data_out = Output(UInt(32.W))
   val count = Output(UInt(32.W))
 }
 
-trait PHYTLModule extends HasRegMap {
-  val io: PHYTLBundle
+trait PHYModule extends HasRegMap {
+  val io: PHYBundle
   implicit val p: Parameters
   def params: PHYParams
 
@@ -88,12 +88,12 @@ trait PHYTLModule extends HasRegMap {
 
 class PHYTL(c: PHYParams)(implicit p: Parameters)
   extends TLRegisterRouter(
-    c.address, "phy", Seq("ucbbar,phy"),
+    c.address, "phy", Seq("phy"),
     beatBytes = c.beatBytes)(
-      new TLRegBundle(c, _) with PHYTLBundle)(
-      new TLRegModule(c, _, _) with PHYTLModule)
+      new TLRegBundle(c, _) with PHYBundle)(
+      new TLRegModule(c, _, _) with PHYModule)
 
-trait HasPeripheryPHY { this: BaseSubsystem =>
+trait HasPeripheryPHYTL { this: BaseSubsystem =>
   implicit val p: Parameters
 
   private val address = 0x2000
@@ -105,9 +105,9 @@ trait HasPeripheryPHY { this: BaseSubsystem =>
   pbus.toVariableWidthSlave(Some(portName)) { phy.node }
 }
 
-trait HasPeripheryPHYModuleImp extends LazyModuleImp {
+trait HasPeripheryPHYTLModuleImp extends LazyModuleImp {
   implicit val p: Parameters
-  val outer: HasPeripheryPHY
+  val outer: HasPeripheryPHYTL
 
   val done = IO(Output(Bool()))
   val data_out = IO(Output(UInt(32.W)))

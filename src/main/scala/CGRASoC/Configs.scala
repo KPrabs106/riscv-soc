@@ -31,7 +31,12 @@ class WithPWM extends Config((site, here, up) => {
 
 class WithPHY extends Config((site, here, up) => {
   case BuildTop => (clock: Clock, reset: Bool, p: Parameters) =>
-    Module(LazyModule(new TopWithPHY()(p)).module)
+    Module(LazyModule(new TopWithPHYTL()(p)).module)
+})
+
+class WithCGRA extends Config((site, here, up) => {
+  case BuildTop => (clock: Clock, reset: Bool, p: Parameters) =>
+    Module(LazyModule(new TopWithCGRATL()(p)).module)
 })
 
 class WithPWMAXI4 extends Config((site, here, up) => {
@@ -60,7 +65,9 @@ class BaseConfig extends Config(
   new freechips.rocketchip.system.DefaultConfig)
 
 class DefaultConfig extends Config(
-  new WithTop ++ new BaseConfig ++ new WithPHY)
+  new WithPHY ++
+  new WithCGRA ++ 
+  new BaseConfig)
 
 class RoccConfig extends Config(
   new WithRoccExample ++ new DefaultConfig)
