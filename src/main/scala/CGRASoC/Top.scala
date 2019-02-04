@@ -34,6 +34,14 @@ class TopWithPWMTL(implicit p: Parameters) extends Top
 class TopWithPWMTLModule(l: TopWithPWMTL)
   extends TopModule(l) with HasPeripheryPWMTLModuleImp
 
+class TopWithPHY(implicit p: Parameters) extends Top
+    with HasPeripheryPHY {
+  override lazy val module = new TopWithPHYModule(this)
+}
+
+class TopWithPHYModule(l: TopWithPHY)
+  extends TopModule(l) with HasPeripheryPHYModuleImp
+
 class TopWithPWMAXI4(implicit p: Parameters) extends Top
     with HasPeripheryPWMAXI4 {
   override lazy val module = new TopWithPWMAXI4Module(this)

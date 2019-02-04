@@ -31,7 +31,7 @@ class WithPWM extends Config((site, here, up) => {
 
 class WithPHY extends Config((site, here, up) => {
   case BuildTop => (clock: Clock, reset: Bool, p: Parameters) =>
-    Module(LazyModule(new TopWithPHYTL()(p)).module)
+    Module(LazyModule(new TopWithPHY()(p)).module)
 })
 
 class WithPWMAXI4 extends Config((site, here, up) => {
@@ -66,6 +66,8 @@ class RoccConfig extends Config(
   new WithRoccExample ++ new DefaultConfig)
 
 class PWMConfig extends Config(new WithPWM ++ new BaseConfig)
+
+class PHYConfig extends Config(new WithPHY ++ new BaseConfig)
 
 class PWMAXI4Config extends Config(new WithPWMAXI4 ++ new BaseConfig)
 

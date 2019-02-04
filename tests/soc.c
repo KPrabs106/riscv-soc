@@ -18,6 +18,9 @@
 MU_TEST(phy_unit_test){
 	reg_write32(PHY_ENABLE, 1);
 
+	uint32_t enable = reg_read32(PHY_ENABLE);
+	mu_check(enable == 1);
+
 	uint32_t done = 0;
 	while (done == 0){
 		done = reg_read32(PHY_DONE);
