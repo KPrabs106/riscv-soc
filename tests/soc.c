@@ -5,12 +5,13 @@
 #define PHY_DATA_IN 0x2020
 
 #define CGRA_ENABLE 0x4000
-#define CGRA_DATA_IN 0x4008
-#define CGRA_ADDRESS_IN 0x4010
+#define CGRA_ADDRESS_IN 0x4008
+#define CGRA_DATA_IN 0x4010
 #define CGRA_DATA_OUT 0x4018
 #define CGRA_DONE 0x4020
 
 #include <stdio.h>
+#include <time.h>
 #include "minunit.h"
 #include "mmio.h"
 
@@ -45,14 +46,23 @@ MU_TEST(cgra_unit_test){
 	reg_write32(CGRA_ENABLE, 1);
 	uint32_t enable = reg_read32(CGRA_ENABLE);
 	mu_check(enable == 1);
+	uint32_t d = reg_read32(CGRA_DONE);
+	mu_check(d == 1);
 
 	uint64_t data = 0x01234567;
 	reg_write64(CGRA_ADDRESS_IN, &data);
-	uint64_t address = reg_read32(CGRA_ADDRESS_IN);
+	uint64_t address = reg_read64(CGRA_ADDRESS_IN);
 	mu_check(address == &data);
+
 	
 	uint32_t done;
-	while( (done = reg_read32(CGRA_DONE)) == 0);
+	uint8_t timer = 1;
+	while( (done = reg_read32(CGRA_DONE)) == 0){
+		if(++timer == 0){
+			mu_fail("timed out!");
+			break;
+		}
+	}
 	
 	uint64_t data_in = reg_read64(CGRA_DATA_IN);
 	mu_check(data_in == data);
@@ -75,7 +85,13 @@ MU_TEST(integration_test){
 	reg_write32(CGRA_ENABLE, 1);
 
 	uint32_t done;
-	while( (done = reg_read32(CGRA_DONE)) == 0);
+	uint8_t timer = 1;
+	while( (done = reg_read32(CGRA_DONE)) == 0){
+		if(++timer == 0){
+			mu_fail("timed out!");
+			break;
+		}
+	}
 
 	uint32_t cgra_data_in = reg_read32(CGRA_DATA_IN);
 	mu_check(cgra_data_in == phy_data_out);
@@ -85,7 +101,6 @@ MU_TEST(integration_test){
 
 	uint32_t phy_data_in = reg_read32(PHY_DATA_IN);
 	mu_check(phy_data_in == cgra_data_out);
-
 }
 
 MU_TEST_SUITE(integration_test_suite){
