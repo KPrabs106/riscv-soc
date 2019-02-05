@@ -41,8 +41,6 @@ trait CGRAModule extends HasRegMap {
   val enable = RegInit(false.B)
   val address_in = Reg(UInt(64.W))
   val data_in = Reg(UInt(64.W))
-  val data_out = Reg(UInt(64.W))
-  val done = RegInit(false.B)
 
   val base = Module(new CGRABase(64))
   io.data_out := base.io.data_out
@@ -60,9 +58,9 @@ trait CGRAModule extends HasRegMap {
     0x10 -> Seq(
       RegField(64, data_in)),
     0x18 -> Seq(
-      RegField(64, data_out)),
+      RegField(64, io.data_out)),
     0x20 -> Seq(
-      RegField(1, done))
+      RegField(1, io.done))
   )
 }
 
