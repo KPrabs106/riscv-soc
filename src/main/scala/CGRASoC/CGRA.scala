@@ -15,16 +15,21 @@ case class CGRAParams(address: BigInt, beatBytes: Int)
 class CGRABase(w: Int) extends Module {
   // TODO fix IO
   val io = IO(new Bundle {
-    val cgra_out = Output(Bool())
+    val data_out = Output(UInt(w.W))
+    val done = Output(Bool())
     val enable = Input(Bool())
+    val address_in = Input(UInt(w.W))
+    val data_in = Input(UInt(w.W))
   })
 
   // TODO add CGRA functionality
-  io.cgra_out := io.enable
+  io.done := io.enable
+  io.data_out := io.data_in + 1.U
 }
 
 trait CGRABundle extends Bundle {
-  val cgra_out = Output(Bool())
+  val data_out = Output(UInt(64.W))
+  val done = Output(Bool())
 }
 
 trait CGRAModule extends HasRegMap {
@@ -34,16 +39,30 @@ trait CGRAModule extends HasRegMap {
   
   // TODO define registers
   val enable = RegInit(false.B)
+  val address_in = Reg(UInt(64.W))
+  val data_in = Reg(UInt(64.W))
+  val data_out = Reg(UInt(64.W))
+  val done = RegInit(false.B)
 
-  val base = Module(new CGRABase(32))
-  io.cgra_out := base.io.cgra_out
+  val base = Module(new CGRABase(64))
+  io.data_out := base.io.data_out
+  io.done := base.io.done
   base.io.enable := enable
+  base.io.address_in := address_in
+  base.io.data_in := data_in
 
   // TODO define regmap
   regmap(
     0x00 -> Seq(
-      RegField(1,enable)
-    )
+      RegField(1,enable)),
+    0x08 -> Seq(
+      RegField(64, address_in)),
+    0x10 -> Seq(
+      RegField(64, data_in)),
+    0x18 -> Seq(
+      RegField(64, data_out)),
+    0x20 -> Seq(
+      RegField(1, done))
   )
 }
 
@@ -70,7 +89,10 @@ trait HasPeripheryCGRATLModuleImp extends LazyModuleImp {
   implicit val p: Parameters
   val outer: HasPeripheryCGRATL
 
-  val cgra_out = IO(Output(Bool()))
+  val done = IO(Output(Bool()))
+  val data_out = IO(Output(UInt(64.W)))
 
-  cgra_out := outer.cgra.module.io.cgra_out
+  done := outer.cgra.module.io.done 
+  data_out := outer.cgra.module.io.data_out
+  
 }

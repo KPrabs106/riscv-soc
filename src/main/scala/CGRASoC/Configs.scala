@@ -65,8 +65,8 @@ class BaseConfig extends Config(
   new freechips.rocketchip.system.DefaultConfig)
 
 class DefaultConfig extends Config(
-  new WithPHY ++
-  new WithCGRA ++ 
+  new WithCGRA ++
+  new WithPHY ++ 
   new BaseConfig)
 
 class RoccConfig extends Config(

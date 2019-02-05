@@ -5,10 +5,10 @@
 #define PHY_DATA_IN 0x2020
 
 #define CGRA_ENABLE 0x4000
-#define CGRA_DONE 0x4008
-#define CGRA_DATA_IN 0x4010
-#define CGRA_ADDRESS_IN 0x4018
-#define CGRA_DATA_OUT 0x4020
+#define CGRA_DATA_IN 0x4008
+#define CGRA_ADDRESS_IN 0x4010
+#define CGRA_DATA_OUT 0x4018
+#define CGRA_DONE 0x4020
 
 #include <stdio.h>
 #include "minunit.h"
