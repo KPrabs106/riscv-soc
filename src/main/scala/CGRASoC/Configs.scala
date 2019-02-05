@@ -39,6 +39,11 @@ class WithCGRA extends Config((site, here, up) => {
     Module(LazyModule(new TopWithCGRATL()(p)).module)
 })
 
+class WithPHYAndCGRA extends Config((site, here, up) => { 
+  case BuildTop => (clock: Clock, reset: Bool, p: Parameters) =>
+    Module(LazyModule(new TopWithPHYAndCGRA()(p)).module)
+})
+
 class WithPWMAXI4 extends Config((site, here, up) => {
   case BuildTop => (clock: Clock, reset: Bool, p: Parameters) =>
     Module(LazyModule(new TopWithPWMAXI4()(p)).module)
@@ -65,8 +70,7 @@ class BaseConfig extends Config(
   new freechips.rocketchip.system.DefaultConfig)
 
 class DefaultConfig extends Config(
-  new WithCGRA ++
-  new WithPHY ++ 
+  new WithPHYAndCGRA ++
   new BaseConfig)
 
 class RoccConfig extends Config(

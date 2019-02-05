@@ -89,10 +89,10 @@ trait HasPeripheryCGRATLModuleImp extends LazyModuleImp {
   implicit val p: Parameters
   val outer: HasPeripheryCGRATL
 
-  val done = IO(Output(Bool()))
-  val data_out = IO(Output(UInt(64.W)))
+  val cgra_done = IO(Output(Bool()))
+  val cgra_data_out = IO(Output(UInt(64.W)))
 
-  done := outer.cgra.module.io.done 
-  data_out := outer.cgra.module.io.data_out
+  cgra_done := outer.cgra.module.io.done 
+  cgra_data_out := outer.cgra.module.io.data_out
   
 }

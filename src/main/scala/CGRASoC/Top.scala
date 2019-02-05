@@ -50,6 +50,17 @@ class TopWithCGRATL(implicit p: Parameters) extends Top
 class TopWithCGRATLModule(l: TopWithCGRATL)
   extends TopModule(l) with HasPeripheryCGRATLModuleImp
 
+class TopWithPHYAndCGRA(implicit p: Parameters) extends Top
+    with HasPeripheryCGRATL
+    with HasPeripheryPHYTL {
+  override lazy val module = new TopWithPHYAndCGRAModule(this)
+}
+
+class TopWithPHYAndCGRAModule(l: TopWithPHYAndCGRA)
+  extends TopModule(l) 
+  with HasPeripheryCGRATLModuleImp
+  with HasPeripheryPHYTLModuleImp
+
 class TopWithPWMAXI4(implicit p: Parameters) extends Top
     with HasPeripheryPWMAXI4 {
   override lazy val module = new TopWithPWMAXI4Module(this)

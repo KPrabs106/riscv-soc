@@ -109,10 +109,10 @@ trait HasPeripheryPHYTLModuleImp extends LazyModuleImp {
   implicit val p: Parameters
   val outer: HasPeripheryPHYTL
 
-  val done = IO(Output(Bool()))
-  val data_out = IO(Output(UInt(32.W)))
-  val count = IO(Output(UInt(32.W)))
-  data_out := outer.phy.module.io.data_out
-  done := outer.phy.module.io.done
-  count := outer.phy.module.io.count
+  val phy_done = IO(Output(Bool()))
+  val phy_data_out = IO(Output(UInt(32.W)))
+  val phy_count = IO(Output(UInt(32.W)))
+  phy_data_out := outer.phy.module.io.data_out
+  phy_done := outer.phy.module.io.done
+  phy_count := outer.phy.module.io.count
 }
