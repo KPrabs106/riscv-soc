@@ -1,10 +1,11 @@
 #define PHY_ENABLE 0x2008
-#define PHY_DONE 0x2010
+#define PHY_DONE 0x2028
 #define PHY_DATA_OUT 0x2014
-#define PHY_COUNT 0x2018
-#define PHY_DATA_IN 0x2020
+//#define PHY_COUNT 0x2018
+//#define PHY_DATA_IN 0x2020
+#define PHY_DATA_IN 0x2018
 
-#define CGRA_ENABLE 0x4000
+#define CGRA_ENABLE 0x4030
 #define CGRA_ADDRESS_IN 0x4008
 #define CGRA_DATA_IN 0x4010
 #define CGRA_DATA_OUT 0x4018
@@ -17,23 +18,33 @@
 
 
 MU_TEST(phy_unit_test){
-	reg_write32(PHY_ENABLE, 1);
 
+	reg_write32(PHY_ENABLE, 1);
 	uint32_t enable = reg_read32(PHY_ENABLE);
 	mu_check(enable == 1);
+
 
 	uint32_t done = 0;
 	while (done == 0){
 		done = reg_read32(PHY_DONE);
 	}
-	
+
+	uint32_t ld_addr = reg_read32(CGRA_ADDRESS_IN);
+	uint32_t st_addr = reg_read32(CGRA_DATA_IN);
+	uint32_t cgra_en = reg_read32(CGRA_ENABLE);
+
+	mu_check(ld_addr == 0x2014);
+	mu_check(st_addr == 0x2018);
+	mu_check(cgra_en == 0x0080); //check whatever you decide to set cgra_en to 
+								 //(when I tried 0x0001 it wouldnt run the sim??)
+
 	uint32_t phy_data = reg_read32(PHY_DATA_OUT);
-	uint32_t count = reg_read32(PHY_COUNT);
+	//uint32_t cgra_data = reg_read32(PHY_DATA_IN);
 
-	reg_write32(PHY_ENABLE, 0);
 
-	mu_check(phy_data == -1);
-	mu_check(count == 6);
+	mu_check(phy_data == 255);
+	//mu_check(cgra_data == 256);
+
 }
 
 MU_TEST_SUITE(PHY_test_suite){
@@ -79,28 +90,28 @@ MU_TEST_SUITE(CGRA_test_suite){
 
 MU_TEST(integration_test){
 	reg_write32(PHY_ENABLE, 1);
-	uint32_t phy_data_out = reg_read32(PHY_DATA_OUT);
+	uint32_t enable = reg_read32(PHY_ENABLE);
+	mu_check(enable == 1);
 
-	reg_write32(CGRA_ADDRESS_IN, PHY_DATA_OUT);
-	reg_write32(CGRA_ENABLE, 1);
 
-	uint32_t done;
-	uint8_t timer = 1;
-	while( (done = reg_read32(CGRA_DONE)) == 0){
-		if(++timer == 0){
-			mu_fail("timed out!");
-			break;
-		}
+	uint32_t done = 0;
+	while (done == 0){
+		done = reg_read32(PHY_DONE);
 	}
 
-	uint32_t cgra_data_in = reg_read32(CGRA_DATA_IN);
-	mu_check(cgra_data_in == phy_data_out);
+	uint32_t ld_addr = reg_read32(CGRA_ADDRESS_IN);
+	uint32_t st_addr = reg_read32(CGRA_DATA_IN);
+	uint32_t cgra_en = reg_read32(CGRA_ENABLE);
 
-	uint32_t cgra_data_out = reg_read32(CGRA_DATA_OUT);
-	mu_check(cgra_data_out == phy_data_out + 1);
+	printf("cgra_en = %x\n", cgra_en);
+	printf("st_addr = %x\n", st_addr);
+	printf("ld_addr = %x\n", ld_addr);
 
-	uint32_t phy_data_in = reg_read32(PHY_DATA_IN);
-	mu_check(phy_data_in == cgra_data_out);
+	mu_check(ld_addr == 0x2014);
+	mu_check(st_addr == 0x2018);
+	mu_check(cgra_en == 1);
+
+	uint32_t phy_data = reg_read32(PHY_DATA_OUT);
 }
 
 MU_TEST_SUITE(integration_test_suite){
