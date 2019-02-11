@@ -51,21 +51,21 @@ class PHYModuleImp(outer: PHY) extends LazyModuleImp(outer) {
       fromSource = 0.U,
       toAddress = load_address,
       lgSize = log2Ceil(beatBytes).U)._2*/
-    val put_req_ld = edge.Put(  //send 0x2014 to load_address
+    val put_req_ld = edge.Put(  //send 0x2018 to load_address
       fromSource = 0.U,
-      toAddress = 0x4008.U,
+      toAddress = 0x00004008.U,
       lgSize = log2Ceil(beatBytes).U,
-      data = 0x2014.U)._2
-    val put_req_st = edge.Put(  //send 0x2018 to store_address
+      data = 0x00002018.U)._2
+    val put_req_st = edge.Put(  //send 0x2020 to store_address
       fromSource = 0.U,
-      toAddress = 0x4010.U,
+      toAddress = 0x00004010.U,
       lgSize = log2Ceil(beatBytes).U,
-      data = 0x2018.U)._2
+      data = 0x00002020.U)._2
     val put_req_en = edge.Put(  //send some value to CGRA's enable (needs to be 32 bits)
       fromSource = 0.U,
-      toAddress = 0x4030.U,
+      toAddress = 0x4000.U,
       lgSize = log2Ceil(beatBytes).U,
-      data = 0x0080.U)._2  
+      data = 0x00000001.U)._2  
 
 
     tl.a.valid := (state === s_ld_addr) || (state === s_st_addr) || (state === s_cgra_en)
@@ -78,12 +78,14 @@ class PHYModuleImp(outer: PHY) extends LazyModuleImp(outer) {
     when (state === s_idle){
       when(enable) {state := s_ld_addr}
       data_out := 0.U
+      printf("phy state = s_idle")
     }
 
     when (state === s_ld_addr){
       tl.a.bits := put_req_ld
       when(tl.a.fire()){state := s_ld_addr2} //ld addr put req sent
       data_out := 0.U
+      printf("phy state = s_ld_addr")
       
     }
 
@@ -92,12 +94,14 @@ class PHYModuleImp(outer: PHY) extends LazyModuleImp(outer) {
         state := s_st_addr
       }
       data_out := 0.U
+      printf("phy state = s_ld_addr2")
     }
 
     when (state === s_st_addr){
       tl.a.bits := put_req_st
       when(tl.a.fire()){state := s_st_addr2} //st addr put req sent
       data_out := 0.U
+      printf("phy state = s_st_addr")
     }
 
     when (state === s_st_addr2){
@@ -105,12 +109,15 @@ class PHYModuleImp(outer: PHY) extends LazyModuleImp(outer) {
         state := s_cgra_en
       }
       data_out := 0.U
+      printf("phy state = s_st_addr2")
     }
 
     when (state === s_cgra_en){
       tl.a.bits := put_req_en
       when(tl.a.fire()){state := s_cgra_en2} //cgra enable put req sent
       data_out := 0.U
+      printf("phy state = s_cgra_en")
+      printf("cgra_enable = %x", tl.a.bits.data)
     }
 
     when (state === s_cgra_en2){
@@ -118,6 +125,7 @@ class PHYModuleImp(outer: PHY) extends LazyModuleImp(outer) {
         state := s_send_receive
       }
       data_out := 0.U
+      printf("phy state = s_cgra_en2")
     }
 
     /*when (state === s_send){ 
@@ -132,6 +140,8 @@ class PHYModuleImp(outer: PHY) extends LazyModuleImp(outer) {
       {
         state := s_idle
       }
+      printf("phy state = s_cgra_en2")
+
     }
     
 
@@ -139,10 +149,10 @@ class PHYModuleImp(outer: PHY) extends LazyModuleImp(outer) {
   outer.regnode.regmap(
     0x08 -> Seq(
       RegField(1, enable)),
-    0x14 -> Seq(
-      RegField(32, data_out)),
     0x18 -> Seq(
-      RegField(32, data_in)),
+      RegField(64, data_out)),
+    0x20 -> Seq(
+      RegField(64, data_in)),
    // 0x04 -> Seq(
      // RegField(1, cgra_enable)),
     0x28 -> Seq(
