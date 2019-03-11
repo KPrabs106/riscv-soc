@@ -17,8 +17,6 @@
 #include "minunit.h"
 #include "mmio.h"
 
-uint64_t write_data[1];
-
 MU_TEST(phy_unit_test){
 
 	reg_write32(PHY_ENABLE, 1);
@@ -34,6 +32,7 @@ MU_TEST(phy_unit_test){
 	uint32_t ld_addr = reg_read32(CGRA_LOAD_ADDRESS);
 	uint32_t st_addr = reg_read32(CGRA_STORE_ADDRESS);
 	uint32_t cgra_en = reg_read32(CGRA_ENABLE);
+	printf("cgra enable: %d\n", cgra_en);
 
 	mu_check(ld_addr == 0x2014);
 	mu_check(st_addr == 0x2018);
@@ -69,6 +68,7 @@ MU_TEST_SUITE(PHY_test_suite){
 }
 
 MU_TEST(cgra_unit_test){
+	uint64_t write_data[1];
 	#define INITIAL_DATA 0x01234567
 	write_data[0] = INITIAL_DATA;
 	reg_write64(CGRA_LOAD_ADDRESS, write_data);
@@ -86,7 +86,7 @@ MU_TEST(cgra_unit_test){
 
 	asm volatile ("fence");
 
-volatile	uint32_t enable = reg_read32(CGRA_ENABLE);
+	volatile uint32_t enable = reg_read32(CGRA_ENABLE);
 	mu_check(enable == 1);
 
 	uint32_t done;

@@ -1,9 +1,9 @@
 base_dir=$(abspath ..)
 sim_dir=$(abspath .)
 
-PROJECT ?= example
+PROJECT ?= CGRASoC
 MODEL ?= TestHarness
-CONFIG ?= DefaultExampleConfig
+CONFIG ?= DefaultConfig
 CFG_PROJECT ?= $(PROJECT)
 TB ?= TestDriver
 
